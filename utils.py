@@ -77,9 +77,9 @@ def extract_overture_data(min_lon, max_lon, min_lat, max_lat):
     return overture_df
 
 
-def using_ons_datasets(retail_df):
+def using_ons_datasets(retail_df, postcode):
     ons_lookup = pd.read_csv("data/raw/ons/PCD_OA_LSOA_MSOA_LAD_MAY22_UK_LU.csv", encoding="latin-1")
-    retail_df = retail_df.merge(ons_lookup[["pcds", "lsoa11cd"]], left_on="postcode", right_on="pcds", how="left").drop("pcds", axis=1).rename(columns={"lsoa11cd":"lsoa"})
+    retail_df = retail_df.merge(ons_lookup[["pcds", "lsoa11cd"]], left_on=postcode, right_on="pcds", how="left").drop("pcds", axis=1).rename(columns={"lsoa11cd":"lsoa"})
     ons_gva = pd.read_excel("data/raw/ons/uksmallareagvaestimates1998to2022.xlsx", sheet_name="Table 1", skiprows=1)
     retail_df = retail_df.merge(ons_gva[["LSOA code", "2022"]], left_on="lsoa", right_on="LSOA code", how="left").drop("LSOA code", axis=1).rename(columns={"2022":"gva_millions"})
     ons_pop = pd.read_excel("data/raw/ons/correcteddataforpublication.xlsx", skiprows=3, sheet_name="Table 1")
