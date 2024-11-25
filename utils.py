@@ -45,6 +45,7 @@ sector_multipliers = {
 }
 
 def xgb_model(df, drop_cols, target, model_type, evaluation_df):
+    
     X = df.drop([*drop_cols, target], axis=1)
     y = df[target]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -59,11 +60,11 @@ def xgb_model(df, drop_cols, target, model_type, evaluation_df):
     # print(f"MAPE: {mape}")
     # print(f"R2 score: {r2}")
 
+    final_df = X_test.copy()
+    final_df["actual"] = y_test
+    final_df["preds"] = y_pred
 
-    X_test["actual"] = y_test
-    X_test["preds"] = y_pred
-
-    underzero = len(X_test[X_test.preds < 0]) / len(X_test)
+    underzero = len(final_df[final_df.preds < 0]) / len(final_df)
     # print(f"{round(underzero*100, 2)}% of the test set are negative predictions")
     evaluation_df.loc[model_type] = [rmse, np.std(y_test), mape, r2, underzero]
 
@@ -73,6 +74,8 @@ def xgb_model(df, drop_cols, target, model_type, evaluation_df):
     )
     plt.title(f"Feature improtance for {model_type}")
     plt.show()
+
+    final_df.to_csv(f"data/proc/predictions_for_{model_type}.csv")
     return evaluation_df
 
 def using_openstreetmap_data(df):
